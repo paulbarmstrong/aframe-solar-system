@@ -13,6 +13,7 @@
 		distance - Distance from the parent body in units (Think of it as astronomical units)
 		period - Period of the satellite in minutes (Think of it as earth years)
 		pin - Boolean of whether or not to create a pin
+		project - Boolean of whether or not to project a line to the floor
 
 **/
 
@@ -23,7 +24,8 @@ AFRAME.registerComponent("satellite", {
 		radius: {type: "number", default: 1},
 		distance: {type: "number", default: 0},
 		period: {type: "number", default: 1},
-		pin: {type: "boolean", default: true}
+		pin: {type: "boolean", default: true},
+		project: {type: "boolean", default: true}
 	},
 	init: function () {
 		
@@ -36,20 +38,36 @@ AFRAME.registerComponent("satellite", {
 		this.camera = this.el.sceneEl.querySelector("#camera");
 		this.name = this.el.id;
 		
+	},
+	update: function () {
+		
 		// Give this entity geometry, material, and position
 		this.el.setAttribute("geometry", "primitive: sphere; radius:"+this.data.radius);
 		this.el.setAttribute("material", "color:"+this.data.color);
-		this.el.setAttribute("position", (new THREE.Vector3(1,1,1)).multiplyScalar(this.data.distance));
+		this.el.setAttribute("position", (new THREE.Vector3(1,1,1)).multiplyScalar(this.data.distance));		
 		
-		// Create a line to show where this satellite is
+		// Handle changes of whether or not to have a pin
 		if (this.data.pin) {
-			this.pinObj = document.createElement("a-entity");
-			this.el.sceneEl.appendChild(this.pinObj);
-			this.pinObj.setAttribute("id", this.el.id+"-pin");
-			this.pinObj.setAttribute("line", "start: 0 0 0; end: 0.1 0 0; color: white");
-			this.pinObj.setAttribute("text", "value:"+this.el.id+"; align: center; xOffset: 0.2");
+			if (this.pinObj == null) {
+				this.pinObj = document.createElement("a-entity");
+				this.el.sceneEl.appendChild(this.pinObj);
+				this.pinObj.setAttribute("id", this.el.id+"-pin");
+				this.pinObj.setAttribute("line", "start: 0 0 0; end: 0.1 0 0; color: white");
+				this.pinObj.setAttribute("text", "value:"+this.el.id+"; align: center; xOffset: 0.2");
+			}
+		} else {
+			if (this.pinObj != null) {
+				this.pinObj.parentNode.removeChild(this.pinObj);
+				this.pinObj = null;
+			}
 		}
-				
+		
+		// Handle changes of whether or not to project
+		if (this.data.project) {
+			this.el.setAttribute("line", "start: 0 0 0; end: 0 -.5 0; color: white");
+		} else {
+			this.el.removeAttribute("line");
+		}
 	},
 	tick: function (time, timeDelta) {
 		
@@ -70,6 +88,20 @@ AFRAME.registerComponent("satellite", {
 				this.name = this.el.id;
 				this.pinObj.setAttribute("text",{value: this.name});
 			}
+		}
+	},
+	remove: function () {
+		
+		// Remove attributes
+		this.el.removeAttribute("geometry");
+		this.el.removeAttribute("material");
+		this.el.removeAttribute("position");
+		this.el.removeAttribute("line");
+		
+		// Remove the pin
+		if (this.pinObj != null) {
+			this.pinObj.parentNode.removeChild(this.pinObj);
+			this.pinObj = null;
 		}
 	},
 	setPos: function (obj, newPos) {

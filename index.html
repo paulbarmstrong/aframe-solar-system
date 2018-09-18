@@ -13,11 +13,11 @@
 			<!-- setting -->
 			
 			<a-sky id="sky" color="#000000"></a-sky>
-			<a-box id="ground" color="#101010" scale="20 1 20" position="0 -3 0"></a-box>
+			<a-cylinder id="ground" color="#101010" scale="5 1 5" position="0 -2 -4"></a-cylinder>
 			
 			<!-- content -->
 			
-			<a-entity id="solar-system" scale="5 5 5">
+			<a-entity id="solar-system" scale="5 5 5" position="0 1 -4">
 				<a-entity id="Sun" satellite="color: #ffba3a; radius: 0.004655"></a-entity>
 					<a-entity id="Mercury" satellite="color: #ad6b39; radius: 0.00001630; period: 0.241; distance: 0.387"></a-entity>
 					<a-entity id="Venus"   satellite="color: #baa076; radius: 0.00004046; period: 0.616; distance: 0.723"></a-entity>
