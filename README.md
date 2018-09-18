@@ -10,6 +10,10 @@
 
 This is an A-Frame scene I am creating as a demonstration of A-Frame for the UMD XR Club. This scene models the solar system in true scale.
 
+## Usage
+
+You can view the project as a webpage [here](https://rawgit.com/paulbarmstrong/aframe-solar-system/master/index.html).
+
 ## Plans
 
 * Implement methods of navigation in VR
