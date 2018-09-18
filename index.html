@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset = "utf-8">
+		<title>Solar System</title>
+		<script src = "https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+		<script src = "satellite.js"></script>
+		<script src = "skyGradient.js"></script>
+	</head>
+	<body>
+		<a-scene>
+			
+			<!-- setting -->
+			
+			<a-sky id="sky" color="#000000"></a-sky>
+			<a-box id="ground" color="#101010" scale="20 1 20" position="0 -3 0"></a-box>
+			
+			<!-- content -->
+			
+			<a-entity id="solar-system" scale="5 5 5">
+				<a-entity id="Sun" satellite="color: #ffba3a; radius: 0.004655"></a-entity>
+					<a-entity id="Mercury" satellite="color: #ad6b39; radius: 0.00001630; period: 0.241; distance: 0.387"></a-entity>
+					<a-entity id="Venus"   satellite="color: #baa076; radius: 0.00004046; period: 0.616; distance: 0.723"></a-entity>
+					<a-entity id="Earth"   satellite="color: #0c5fcc; radius: 0.00004263; period: 1.000; distance: 1.000">
+						<a-entity id="Moon" satellite="color: #9b9b9b; radius: 0.00001161; period: 0.0749; distance: 0.00257; pin:false"></a-entity>
+					</a-entity>
+				</a-entity>
+			</a-entity>	
+	
+			<!-- camera and hands -->
+			<a-camera id="camera" wasd-controls="fly: true;"></a-camera>
+			
+		<!--
+			<a-entity id="left-hand"></a-entity>
+			<a-entity id="right-hand"></a-entity>
+		-->
+			
+		</a-scene>
+	</body>
+<html>

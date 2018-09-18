@@ -1,0 +1,14 @@
+Approximate Properties of some objects 
+
+Object		Rotation (Earth yrs) 	Period (Earth yrs)	Distance (AU)	Radius (AU)
+Sun			1						1					0				0.004655
+Mercury		0.161					0.241				0.387			0.00001630
+Venus		0.666					0.616				0.723			0.00004046
+Earth		0.00274					1					1				0.00004263
+>Moon		0.0749					0.0749				0.00257			0.00001161
+Mars		0.00282					1.88
+Jupiter		0.00112					11.86
+Saturn		0.00123					29.46
+Uranus		0.00197					84.01
+Neptune		0.00184					164.79
+Pluto		0.0175					248.59
