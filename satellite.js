@@ -80,7 +80,7 @@ AFRAME.registerComponent("satellite", {
 			// Move/scale/rotate the pin
 			this.setPos(this.pinObj.object3D, this.el.object3D.getWorldPosition());
 			this.setScale(this.pinObj.object3D, (new THREE.Vector3(1,1,1)).multiplyScalar(
-							2*this.pinObj.object3D.position.distanceTo(this.camera.object3D.position)));
+							1*this.pinObj.object3D.position.distanceTo(this.camera.object3D.position)));
 			this.pinObj.object3D.setRotationFromEuler(this.camera.object3D.rotation);
 			
 			// If the name updates, change the text
