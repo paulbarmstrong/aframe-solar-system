@@ -7,6 +7,7 @@
 		<script src = "satellite.js"></script>
 		<script src = "six-dof-controller.js"></script>
 		<script src = "navigate.js"></script>
+		<script src = "body.js"></script>
 	</head>
 	<body>
 		<a-scene>
@@ -15,7 +16,7 @@
 			<a-sky id="sky" color="#000000"></a-sky>
 			
 			<!-- content -->
-			<a-entity id="solar-system" scale="5 5 5" position="0 1 -5">
+			<a-entity id="solar-system" scale="5 5 5" position="0 1 -5" body="velocity: 0 1 0">
 				<a-entity id="Sun" satellite="color: #ffba3a; radius: 0.004655"></a-entity>
 					<a-entity id="Mercury" satellite="color: #ad6b39; radius: 0.00001630; period: 0.241; distance: 0.387"></a-entity>
 					<a-entity id="Venus"   satellite="color: #baa076; radius: 0.00004046; period: 0.616; distance: 0.723"></a-entity>
