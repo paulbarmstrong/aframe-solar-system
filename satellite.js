@@ -1,5 +1,5 @@
 /**
-	A-Frame Component: satellite
+	A-Frame Component/System: satellite
 	
 	Author: Paul Armstrong
 	
@@ -17,6 +17,68 @@
 
 **/
 
+AFRAME.registerSystem("satellite", {
+	init: function () {
+		
+		// Bind functions
+		this.registerSat = this.registerSat.bind(this);
+		this.unregisterSat = this.unregisterSat.bind(this);
+		
+		// Define a function to check for satellite name changes
+		this.nameCheck = AFRAME.utils.throttle(function (sat) {
+			for (var i = 0; i < this.satellites.length; i++) {
+				var sat = this.satellites[i];
+				if (sat.el.id !== sat.name) {
+					sat.name = sat.el.id;
+					sat.pinObj.setAttribute("text", {value: sat.name});
+				}
+			}
+		}, 1000, this);
+		
+		// Set starting variables
+		this.target = this.el.sceneEl.querySelector("#Mercury");
+		this.frameOfRef = this.el.sceneEl.querySelector("#frame-of-reference");
+		this.camera = this.el.sceneEl.querySelector("#camera");
+		this.satellites = [];
+	},
+	tick: function (time, deltaTime) {
+				
+		for (var i = 0; i < this.satellites.length; i++) {
+			
+			var sat = this.satellites[i];
+			
+			// Move the satellite
+			var specificTime = Math.PI*time/(sat.data.period*30000);
+			var newPos = new THREE.Vector3(Math.sin(specificTime)*sat.data.distance, 0, Math.cos(specificTime)*sat.data.distance);
+			sat.el.object3D.position.copy(newPos);
+			
+			if (sat.pinObj != null && this.camera != null) {
+				
+				sat.pinObj.object3D.scale.copy((new THREE.Vector3(1,1,1)).multiplyScalar(
+								sat.el.object3D.getWorldPosition().distanceTo(this.camera.object3D.position)/sat.el.object3D.getWorldScale().x));
+				sat.pinObj.object3D.setRotationFromEuler(this.camera.object3D.rotation);
+			}
+		}
+		
+		// Perform a name check every second (function is throttled)
+		this.nameCheck();
+		
+		// Translate the frame of reference to offset the position of the target
+        if (this.frameOfRef != null && this.target != null) {
+            this.frameOfRef.object3D.position.copy(this.frameOfRef.object3D.worldToLocal(this.target.object3D.getWorldPosition()).multiplyScalar(-1));
+        }
+		
+	},
+	registerSat: function (satRef) {
+		this.satellites.push(satRef);
+	},
+	unregisterSat: function (satRef) {
+		var index = this.satellites.indexOf(satRef);
+		if (index > 0) {
+			this.satellites.splice(index, 1);
+		}
+	}
+});
 
 AFRAME.registerComponent("satellite", {
 	schema: {
@@ -32,6 +94,9 @@ AFRAME.registerComponent("satellite", {
 		// Bind functions
 		this.setPos = this.setPos.bind(this);
 		this.setScale = this.setScale.bind(this);
+		
+		// Register with the system
+		this.system.registerSat(this);
 		
 		// Set starting variables
 		this.orbitTime = 0;
@@ -50,7 +115,7 @@ AFRAME.registerComponent("satellite", {
 		if (this.data.pin) {
 			if (this.pinObj == null) {
 				this.pinObj = document.createElement("a-entity");
-				this.el.sceneEl.appendChild(this.pinObj);
+				this.el.appendChild(this.pinObj);
 				this.pinObj.setAttribute("id", this.el.id+"-pin");
 				this.pinObj.setAttribute("line", "start: 0 0 0; end: 0.1 0 0; color: white");
 				this.pinObj.setAttribute("text", "value:"+this.el.id+"; align: center; xOffset: 0.2");
@@ -69,27 +134,6 @@ AFRAME.registerComponent("satellite", {
 			this.el.removeAttribute("line");
 		}
 	},
-	tick: function (time, timeDelta) {
-		
-		// Move the satellite
-		this.el.object3D.position.set(Math.sin(this.orbitTime)*this.data.distance, 0, Math.cos(this.orbitTime)*this.data.distance);
-		this.orbitTime += Math.PI*timeDelta/(this.data.period*30000);
-		
-		if (this.pinObj != null && this.camera != null) {
-			
-			// Move/scale/rotate the pin
-			this.setPos(this.pinObj.object3D, this.el.object3D.getWorldPosition());
-			this.setScale(this.pinObj.object3D, (new THREE.Vector3(1,1,1)).multiplyScalar(
-							1*this.pinObj.object3D.position.distanceTo(this.camera.object3D.position)));
-			this.pinObj.object3D.setRotationFromEuler(this.camera.object3D.rotation);
-			
-			// If the name updates, change the text
-			if (this.el.id !== this.name) {
-				this.name = this.el.id;
-				this.pinObj.setAttribute("text",{value: this.name});
-			}
-		}
-	},
 	remove: function () {
 		
 		// Remove attributes
@@ -97,6 +141,9 @@ AFRAME.registerComponent("satellite", {
 		this.el.removeAttribute("material");
 		this.el.removeAttribute("position");
 		this.el.removeAttribute("line");
+		
+		// Unregister with the system
+		this.system.unregisterSat(this);
 		
 		// Remove the pin
 		if (this.pinObj != null) {
