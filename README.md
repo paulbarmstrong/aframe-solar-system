@@ -3,12 +3,12 @@
 ## Details
 
 * Author: Paul Armstrong
-* Date: September 2018
-* Progress: 10%
+* Date: October 2018
+* Progress: 20%
 
 ## Description
 
-This is an A-Frame scene I am creating as a demonstration of A-Frame for the UMD XR Club. This scene models the solar system in true scale.
+This is an A-Frame scene I am creating as a demonstration of A-Frame to the UMD XR Club. This scene models the solar system in true scale.
 
 ## Usage
 
@@ -16,8 +16,8 @@ You can view the project as a webpage [here](https://rawgit.com/paulbarmstrong/a
 
 ## Plans
 
-* Implement methods of navigation in VR
-* Allow for the camera to follow planets' frame of reference
+* Improve the navigation component with a method of scaling the solar system
+* Add a smooth interpolation transition when swapping frames of reference
 
 ## Motivations
 

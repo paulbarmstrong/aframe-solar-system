@@ -8,16 +8,27 @@
 		<script src = "six-dof-controller.js"></script>
 		<script src = "navigate.js"></script>
 		<script src = "body.js"></script>
+		<script src = "handle-on-click.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body>
+		<div id="dialog" class="img-rounded intro-overlay">
+			<h3><strong>Frame of Reference</strong></h3>
+			<button onclick="handleOnClick('Sun')" class="btn btn-info" type="button"><h4>Sun</h4></button>
+			<button onclick="handleOnClick('Mercury')" class="btn btn-info" type="button"><h4>Mercury</h4></button>
+			<button onclick="handleOnClick('Venus')" class="btn btn-info" type="button"><h4>Venus</h4></button>
+			<button onclick="handleOnClick('Earth')" class="btn btn-info" type="button"><h4>Earth</h4></button>
+			<button onclick="handleOnClick('Moon')" class="btn btn-info" type="button"><h4>Moon</h4></button>
+			<br>
+		</div>
 		<a-scene>
 			
 			<!-- setting -->
 			<a-sky id="sky" color="#000000"></a-sky>
 			
 			<!-- content -->
-			<a-entity id="frame-of-reference">
-			<a-entity id="transformations" scale="5 5 5" position="0 1 -5" body="velocity: 0 1 0">
+			<a-entity id="transformations" position="0 0 -5" scale="5 5 5" body="velocity: 0 2 0">
+			<a-entity id="frame-of-reference" position="0 1 -5">
 				<a-entity id="Sun" satellite="color: #ffba3a; radius: 0.004655">
 					<a-entity id="Mercury" satellite="color: #ad6b39; radius: 0.00001630; period: 0.241; distance: 0.387"></a-entity>
 					<a-entity id="Venus"   satellite="color: #baa076; radius: 0.00004046; period: 0.616; distance: 0.723"></a-entity>

@@ -1,0 +1,29 @@
+.intro-overlay {
+	z-index: 1;
+	position: absolute;
+	bottom: 25px;
+	left: 25px;
+	max-width: 550px;
+	box-sizing: border-box;
+	padding: 1.5em;
+	color: #ffffff;
+	background: rgba(0, 0, 0, 0.75);
+	font-family: Source Sans Pro, Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+@media only screen and (max-width: 80em) {
+	h3 {
+		font-size: 12px;
+	}
+	h4 {
+		font-size: 7px;
+	}
+	p {
+		font-size: 10px;
+	}
+	.intro-overlay {
+		bottom: 5px;
+		left: 5px;
+		max-width: 200px;
+		padding: 0.5em;
+	}
+}

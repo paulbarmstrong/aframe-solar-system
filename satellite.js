@@ -36,7 +36,7 @@ AFRAME.registerSystem("satellite", {
 		}, 1000, this);
 		
 		// Set starting variables
-		this.target = this.el.sceneEl.querySelector("#Mercury");
+		this.target = this.el.sceneEl.querySelector("#Sun");
 		this.frameOfRef = this.el.sceneEl.querySelector("#frame-of-reference");
 		this.camera = this.el.sceneEl.querySelector("#camera");
 		this.satellites = [];
