@@ -1,7 +1,7 @@
 /**
 	A-Frame Component/System: satellite
 	
-	Author: Paul Armstrong
+	Author: Paul
 	
 	Description:
 		This component will turn the entity into a sphere revolving its parent location.
@@ -24,22 +24,26 @@ AFRAME.registerSystem("satellite", {
 		this.registerSat = this.registerSat.bind(this);
 		this.unregisterSat = this.unregisterSat.bind(this);
 		
-		// Define a function to check for satellite name changes
-		this.nameCheck = AFRAME.utils.throttle(function (sat) {
-			for (var i = 0; i < this.satellites.length; i++) {
-				var sat = this.satellites[i];
-				if (sat.el.id !== sat.name) {
-					sat.name = sat.el.id;
-					sat.pinObj.setAttribute("text", {value: sat.name});
-				}
-			}
-		}, 1000, this);
-		
 		// Set starting variables
 		this.target = this.el.sceneEl.querySelector("#Sun");
 		this.frameOfRef = this.el.sceneEl.querySelector("#frame-of-reference");
 		this.camera = this.el.sceneEl.querySelector("#camera");
 		this.satellites = [];
+		
+		// Define a function to check for satellite name changes
+		this.nameCheck = AFRAME.utils.throttle(function (sat) {
+			for (var i = 0; i < this.satellites.length; i++) {
+				var sat = this.satellites[i];
+								
+				if (sat != null && sat.pinObj != null) {
+					if (sat.el.id != sat.name) {
+						sat.name = sat.el.id;
+						sat.pinObj.setAttribute("text", {value: sat.name});
+					}
+				}
+			}
+		}, 1000, this);
+		
 	},
 	tick: function (time, deltaTime) {
 				
@@ -54,9 +58,14 @@ AFRAME.registerSystem("satellite", {
 			
 			if (sat.pinObj != null && this.camera != null) {
 				
-				sat.pinObj.object3D.scale.copy((new THREE.Vector3(1,1,1)).multiplyScalar(
-								sat.el.object3D.getWorldPosition().distanceTo(this.camera.object3D.position)/sat.el.object3D.getWorldScale().x));
+				// Rescale and rotate the pinObj to face the camera at the correct scale
+				var oldFactor = sat.pinObj.object3D.scale.x;
+				var newFactor = sat.el.object3D.getWorldPosition().distanceTo(this.camera.object3D.position)/sat.el.object3D.getWorldScale().x;
+				sat.pinObj.object3D.scale.lerp(new THREE.Vector3(newFactor, newFactor, newFactor), oldFactor < 0.01 ? 0.05 : 1);
 				sat.pinObj.object3D.setRotationFromEuler(this.camera.object3D.rotation);
+				
+				// Change the visibility of the pinObj if the text scale factor is very crazy
+				sat.pinObj.object3D.visible = oldFactor > 0.005;
 			}
 		}
 		
@@ -64,9 +73,9 @@ AFRAME.registerSystem("satellite", {
 		this.nameCheck();
 		
 		// Translate the frame of reference to offset the position of the target
-        if (this.frameOfRef != null && this.target != null) {
-            this.frameOfRef.object3D.position.copy(this.frameOfRef.object3D.worldToLocal(this.target.object3D.getWorldPosition()).multiplyScalar(-1));
-        }
+		if (this.frameOfRef != null && this.target != null) {
+			this.frameOfRef.object3D.position.copy(this.frameOfRef.object3D.worldToLocal(this.target.object3D.getWorldPosition()).multiplyScalar(-1));
+		}
 		
 	},
 	registerSat: function (satRef) {
@@ -92,8 +101,7 @@ AFRAME.registerComponent("satellite", {
 	init: function () {
 		
 		// Bind functions
-		this.setPos = this.setPos.bind(this);
-		this.setScale = this.setScale.bind(this);
+		this.getMesh = this.getMesh.bind(this);
 		
 		// Register with the system
 		this.system.registerSat(this);
@@ -107,9 +115,15 @@ AFRAME.registerComponent("satellite", {
 	update: function () {
 		
 		// Give this entity geometry, material, and position
-		this.el.setAttribute("geometry", "primitive: sphere; radius:"+this.data.radius);
+		this.el.setAttribute("geometry", "primitive: sphere; radius: 1");
 		this.el.setAttribute("material", "color:"+this.data.color);
-		this.el.setAttribute("position", (new THREE.Vector3(1,1,1)).multiplyScalar(this.data.distance));		
+		this.el.setAttribute("position", (new THREE.Vector3(1,1,1)).multiplyScalar(this.data.distance));
+		
+		// Set the scale of the three.js mesh directly (to avoid affecting children's scale factor)
+		var mesh = this.getMesh(this.el.object3D);
+		if (mesh != null) {
+			mesh.scale.set(this.data.radius, this.data.radius, this.data.radius);
+		}
 		
 		// Handle changes of whether or not to have a pin
 		if (this.data.pin) {
@@ -151,10 +165,20 @@ AFRAME.registerComponent("satellite", {
 			this.pinObj = null;
 		}
 	},
-	setPos: function (obj, newPos) {
-		obj.position.set(newPos.x, newPos.y, newPos.z);
-	},
-	setScale: function (obj, newPos) {
-		obj.scale.set(newPos.x, newPos.y, newPos.z);
+	getMesh: function (object3D) {
+		
+		// Do a breadth first search to find the mesh object3D at the highest possible level of the object3D tree
+		var queue = [object3D];
+		while (queue.length > 0) {
+			object3D = queue.shift();
+			if (object3D.type == "Mesh") {
+				return object3D;
+			}
+			for (var i = 0; i < object3D.children.length; i++) {
+				queue.push(object3D.children[i]);
+			}
+			object3D = object3D.children[0];
+		}
+		return null;
 	}
 });

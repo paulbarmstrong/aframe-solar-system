@@ -19,9 +19,13 @@ AFRAME.registerSystem("navigate", {
 		this.setHandState = this.setHandState.bind(this);
 		this.getHandState = this.getHandState.bind(this);
 		this.removeHand = this.removeHand.bind(this);
+		this.getOtherDrag = this.getOtherDrag.bind(this);
 		
 		this.target = this.el.sceneEl.querySelector("#transformations");
+		
+		// Scaling variables
 		this.scaling = false;
+		this.timeScaleEnd = 0;
 		
 		// Define the this.StateType Enumeration
 		this.StateType = Object.freeze({"None" : 0, "Dragging" : 1, "Flying" : 2, "Scaling" : 3});
@@ -50,6 +54,16 @@ AFRAME.registerSystem("navigate", {
 					
 				}
 			}.bind(this));
+		} else {
+			
+			var midpoint = this.leftEl.object3D.position.clone().add(this.rightEl.object3D.position).multiplyScalar(0.5);
+			var distance = this.leftEl.object3D.position.distanceTo(this.rightEl.object3D.position);
+			
+			this.target.object3D.scale.copy(this.scale0.clone().multiplyScalar(distance / this.distance0));
+			this.target.object3D.position.copy(
+					this.position0.clone().add(
+					this.midpoint0.clone().sub(this.position0).multiplyScalar((this.distance0 - distance) / this.distance0)));
+			
 		}
 	},
 	startState: function (handEl, newState) {
@@ -75,8 +89,8 @@ AFRAME.registerSystem("navigate", {
 	endState: function (handEl, oldState) {
 		if (oldState.type == this.StateType.Dragging) {
 			
-			// If the target has a body component, set the velocity
-			if (this.target.hasAttribute("body")) {
+			// If the target has a body component and scaling hasn't ended recently, set the velocity
+			if (this.target.hasAttribute("body") && ((new Date()).getTime() - this.timeScaleEnd > 500)) {
 				this.target.setAttribute("body", {velocity: oldState.velocity.multiplyScalar(2)});
 			}
 		} else if (oldState.type == this.StateType.Flying) {
@@ -94,25 +108,32 @@ AFRAME.registerSystem("navigate", {
 		if (this.hands.has(handEl) && this.hands.get(handEl).type == stateType) {
 			return;
 		}
-		
+
 		// First check if this should initiate scaling instead of the given state type
-	/*	if (stateType == this.StateType.Dragging) {
-			var drags = [];
-			this.hands.forEach(function (key, value, map) {
-				if (value == this.StateType.Dragging) {
-					drags.push(key);
-				}
-			}.bind(this));
-			if (drags.length == 1 && drags[0] != handEl) {
-				this.scaling = true;
+		var otherDrag = this.getOtherDrag(handEl);
+		if (stateType == this.StateType.Dragging && otherDrag != null && !this.scaling) {
+			this.leftEl = otherDrag;
+			this.rightEl = handEl;
+			this.midpoint0 = this.leftEl.object3D.position.clone().add(this.rightEl.object3D.position).multiplyScalar(0.5);
+			this.distance0 = this.leftEl.object3D.position.distanceTo(this.rightEl.object3D.position);
+			this.scale0 = this.target.object3D.scale.clone();
+			this.position0 = this.target.object3D.position.clone();
+			
+			this.scaling = true;
+		} else if (stateType == this.StateType.None && this.hands.has(handEl) && this.hands.get(handEl).type == this.StateType.Dragging
+				&& this.scaling) {
+			
+			// If the other hand is still dragging, correct the drag's offset after scaling
+			if (otherDrag != null) {
+				var otherState = this.hands.get(otherDrag);
+				otherState.offset = this.target.object3D.position.clone().sub(otherDrag.object3D.position);
+				otherState.velocity = new THREE.Vector3(0,0,0);
 			}
-		} else if (this.hands.has(handEl) && this.hands.get(handEl).type == this.StateType.Dragging
-				&& stateType == this.StateType.None && this.scaling) {
+			
+			this.timeScaleEnd = (new Date()).getTime();
+			
 			this.scaling = false;
 		}
-		*/
-
-
 	
 		if (this.hands.has(handEl)) {
 			this.endState(handEl, this.hands.get(handEl));
@@ -122,17 +143,6 @@ AFRAME.registerSystem("navigate", {
 			this.startState(handEl, newState);
 		}
 		this.hands.set(handEl, newState);
-
-		
-	/*	var params = {count: 0};
-		this.hands.forEach(function (key, value, map) {
-			if (value == HandState.Dragging) {
-				this.count++;
-			}
-		}.bind(params));
-		if (params.count == 2) {
-			this.scaling = true;
-		} */
 	},
 	getHandState: function (handEl) {
 		this.hands.get(handEl);
@@ -142,6 +152,19 @@ AFRAME.registerSystem("navigate", {
 	},
 	getVertAxis: function (evt) {
 		this.vertJoyAxis = evt.detail.axis[1];
+	},
+	getOtherDrag: function (handEl) {
+		var drags = [];
+		this.hands.forEach(function (value, key, map) {
+			if (key != handEl && value.type == this.StateType.Dragging) {
+				drags.push(key);
+			}
+		}.bind(this));
+		if (drags.length == 1) {
+			return drags[0];
+		} else {
+			return null;
+		}
 	}
 }); 
 
@@ -187,4 +210,3 @@ AFRAME.registerComponent("navigate", {
 		this.system.removeHand(this.el);
 	}
 });
- 

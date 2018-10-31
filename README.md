@@ -4,7 +4,7 @@
 
 * Author: Paul Armstrong
 * Date: October 2018
-* Progress: 20%
+* Progress: 30%
 
 ## Description
 
@@ -16,7 +16,8 @@ You can view the project as a webpage [here](https://rawgit.com/paulbarmstrong/a
 
 ## Plans
 
-* Improve the navigation component with a method of scaling the solar system
+* Create an option for bodies' paths to be traced with a line
+* Create an option to automatically convert to the frame of reference of nearest body
 * Add a smooth interpolation transition when swapping frames of reference
 
 ## Motivations
