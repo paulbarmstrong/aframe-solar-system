@@ -8,6 +8,7 @@
 		<script src = "six-dof-controller.js"></script>
 		<script src = "navigate.js"></script>
 		<script src = "body.js"></script>
+		<script src = "border-circle.js"></script>
 		<script src = "handle-on-click.js"></script>
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
@@ -35,8 +36,7 @@
 					<a-entity id="Earth"   satellite="color: #0c5fcc; radius: 0.00004263; period: 1.000; distance: 1.000">
 						<a-entity id="Moon" satellite="color: #9b9b9b; radius: 0.00001161; period: 0.0749; distance: 0.00257; pin:false"></a-entity>
 					</a-entity>
-					<a-ring id="ground" color="#777777" scale="1 1 1" position="0 -0.5 0" rotation="90 0 0"
-					segments-theta="128" segments-phi="1" radius-inner="1" radius-outer="1.0001" wireframe="true"></a-cylinder>
+					<a-entity id="au-ring" position="0 -0.5 0" rotation="90 0 0" border-circle="radius: 1"></a-entity>
 				</a-entity>
 			</a-entity>	
 			</a-entity>	
