@@ -12,7 +12,7 @@ This is an A-Frame scene I am creating as a demonstration of A-Frame to the UMD 
 
 ## Usage
 
-You can view the project as a webpage [here](https://rawgit.com/paulbarmstrong/aframe-solar-system/master/index.html).
+You can view the project as a webpage [here](https://paulbarmstrong.github.io/aframe-solar-system/).
 
 ## Plans
 
